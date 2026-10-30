@@ -1,0 +1,8 @@
+mobile-shared/gradlew text eol=lf
+mobile-shared/**/*.kt text eol=lf
+mobile-shared/**/*.kts text eol=lf
+mobile-ios/**/*.swift text eol=lf
+mobile-ios/**/*.plist text eol=lf
+mobile-ios/**/*.xcprivacy text eol=lf
+scripts/ios/*.sh text eol=lf
+.github/workflows/ayudix-ios.yml text eol=lf

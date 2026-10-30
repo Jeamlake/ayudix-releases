@@ -1,0 +1,57 @@
+name: Ayudix
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  xcodeVersion: "26.4"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Ayudix:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources/PrivacyInfo.xcprivacy
+      - path: Resources/Assets.xcassets
+    settings:
+      base:
+        INFOPLIST_FILE: Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: pe.ayudix.link.ios
+        PRODUCT_NAME: Ayudix
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        FRAMEWORK_SEARCH_PATHS: $(inherited) $(SRCROOT)/../mobile-shared/ui/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+        OTHER_LDFLAGS: $(inherited) -framework AyudixShared
+    preBuildScripts:
+      - name: Preparar Kotlin compartido
+        script: |
+          set -euo pipefail
+          cd "$SRCROOT/../mobile-shared"
+          /bin/bash ./gradlew :ui:embedAndSignAppleFrameworkForXcode --no-daemon --max-workers=2
+        basedOnDependencyAnalysis: false
+    scheme:
+      gatherCoverageData: false
+      build:
+        targets:
+          Ayudix: all
+      testTargets:
+        - AyudixUITests
+  AyudixUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pe.ayudix.link.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Ayudix
+    dependencies:
+      - target: Ayudix

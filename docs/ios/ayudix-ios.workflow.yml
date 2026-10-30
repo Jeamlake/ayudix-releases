@@ -21,10 +21,6 @@ jobs:
     timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.4.app/Contents/Developer
-      GRADLE_USER_HOME: ${{ runner.temp }}/Ayudix/Gradle
-      KONAN_DATA_DIR: ${{ runner.temp }}/Ayudix/KotlinNative
-      AYUDIX_IOS_LOGS: ${{ runner.temp }}/Ayudix/Logs
-      AYUDIX_IOS_DERIVED: ${{ runner.temp }}/Ayudix/Xcode
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -34,6 +30,17 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      - name: Preparar rutas temporales
+        shell: bash
+        run: |
+          set -euo pipefail
+          for ENTRY in \
+            "GRADLE_USER_HOME=$RUNNER_TEMP/Ayudix/Gradle" \
+            "KONAN_DATA_DIR=$RUNNER_TEMP/Ayudix/KotlinNative" \
+            "AYUDIX_IOS_LOGS=$RUNNER_TEMP/Ayudix/Logs" \
+            "AYUDIX_IOS_DERIVED=$RUNNER_TEMP/Ayudix/Xcode"; do
+            echo "$ENTRY" >> "$GITHUB_ENV"
+          done
       - name: Verificar herramientas Apple
         shell: bash
         run: |

@@ -33,6 +33,7 @@ job = workflow["jobs"]["build-and-check"]
 assert job["runs-on"] == "macos-26" and job["timeout-minutes"] == 45
 assert "private == false" in job["if"]
 assert job["env"]["DEVELOPER_DIR"] == "/Applications/Xcode_26.4.app/Contents/Developer"
+assert all("runner." not in str(value) for value in job["env"].values()), "Runner context is not available in job-level env"
 for step in job["steps"]:
     if "uses" in step:
         assert re.fullmatch(r"actions/[a-z-]+@[a-f0-9]{40}", step["uses"]), "Actions must be pinned to reviewed commits"

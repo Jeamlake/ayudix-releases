@@ -15,6 +15,16 @@ El propietario eligió **AltStore Classic con AltServer en Windows**. Requiere t
 
 La PC mantiene instaladores en `C:\Desarrollo\Instaladores\Ayudix-iOS`, herramientas en `C:\Desarrollo\Herramientas\Ayudix-iOS` y resultados de compilación en `C:\Desarrollo\Logs\Ayudix\iOS-Preparacion-2026-10-30`. Esta guía no instala herramientas automáticamente.
 
+## Si falla el instalador antiguo de iCloud
+
+En esta PC se observó el error Windows Installer 1722 en `RuniCloudUpgrade` (`iCloud.exe /upgrade`). El fallo no acredita que iCloud se haya instalado. La conectividad HTTPS básica respondió y el reloj coincidió con Apple; esas comprobaciones no prueban un inicio de sesión correcto.
+
+Para proporcionar las dependencias a AltServer se extrajeron los archivos originales de `iCloud64.msi`, cuya firma de Apple se verificó, y se copiaron las bibliotecas públicas de Apple Application Support ya instalado. No se modificó el MSI ni se ejecutaron sus acciones de instalación; tampoco se reemplazaron bibliotecas del sistema o se leyeron credenciales Apple. `AOSKit.dll` conserva su firma válida.
+
+La carpeta preparada es `C:\Desarrollo\Herramientas\Ayudix-iOS\DependenciasApple\7.21\Apple`. Si AltServer muestra **iCloud Not Found**, elige **Choose Folder…** y selecciona esa carpeta, que contiene `Internet Services` y `Apple Application Support`. El uso de una carpeta separada de bibliotecas está descrito en la [guía oficial de AltStore](https://faq.altstore.io/altstore-classic/troubleshooting-guide).
+
+El script reproducible es `scripts/ios/prepare-altstore-libraries.ps1`; requiere el MSI oficial con firma válida y una copia completa de 7-Zip. Los binarios de Apple permanecen fuera del repositorio y del ZIP GPL de fuentes. El recibo local distingue extracción, carga por AltServer y autenticación: estas dos últimas siguen pendientes hasta probarlas. Esto prepara una alternativa para AltServer; no repara la aplicación completa de iCloud ni demuestra que se haya resuelto el error de inicio de sesión de iTunes.
+
 ## Prueba física pendiente
 
 Abre Ayudix y vincula el iPhone con su propio QR desde la seguridad de Windows. Comprueba la cámara, el permiso de red local, la selección de PC, las carpetas y el chat de texto. Para el chat, prepara Tailscale o el HTTPS admitido por el cliente. No reutilices la credencial del HONOR ni publiques el QR.

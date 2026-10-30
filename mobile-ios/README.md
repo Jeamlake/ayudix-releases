@@ -1,6 +1,6 @@
 # Ayudix para iPhone y iPad — preparación 0.1.0
 
-Este cliente se desarrolla en el mismo repositorio que Windows y Android. No es una conversión de APK, no sustituye la versión Android instalada y todavía no es una entrega iOS firmada.
+Este cliente se desarrolla en el mismo repositorio que Windows y Android. No es una conversión de APK, no sustituye la versión Android instalada y todavía no es una entrega iOS firmada. La compilación nativa de simulador y dispositivo ya pasó; tres pruebas XCTest de interfaz aprobaron en iPhone 17/iOS 26.4.1. El IPA arm64 sin firma pasó la comprobación de estructura, recibo de fuentes y SHA-256. Consulta el [estado con evidencias](../docs/ios/ESTADO-PREPARACION-2026-10-30.md).
 
 ## Carpetas
 
@@ -43,7 +43,7 @@ export AYUDIX_SIMULATOR_UDID="UUID-del-simulador-iPhone-17"
 
 El flujo de GitHub elige un simulador disponible de iPhone 17. Solo se activa manualmente, con permisos de lectura del repositorio, límite de 45 minutos y retención de artefactos de tres días. Se detiene si el repositorio es privado o falta el Xcode fijado; no cambia a un runner de pago ni transmite credenciales de esta PC.
 
-La salida de dispositivo será `release/ios-preparation/Ayudix-iOS-0.1.0-preparation-UNSIGNED.ipa` **si la compilación Apple pasa**. Un ZIP de fuentes o un IPA sin firma no acredita instalación ni funcionamiento en el iPhone. No se creó un IPA en Windows.
+La salida verificada de dispositivo es `release/ios-preparation/Ayudix-iOS-0.1.0-preparation-UNSIGNED.ipa`, compilada en macOS y descargada a Windows. Un ZIP de fuentes o un IPA sin firma no acredita instalación ni funcionamiento en el iPhone.
 
 ## Firma y distribución pendientes
 

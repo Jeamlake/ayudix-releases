@@ -49,6 +49,7 @@ for target in project["targets"].values():
 info = plistlib.loads((root / "mobile-ios/Resources/Info.plist").read_bytes())
 privacy = plistlib.loads((root / "mobile-ios/Resources/PrivacyInfo.xcprivacy").read_bytes())
 assert info["NSCameraUsageDescription"] and info["NSLocalNetworkUsageDescription"]
+assert info.get("CADisableMinimumFrameDurationOnPhone") is True, "Compose requires ProMotion support at runtime"
 assert info["NSAppTransportSecurity"] == {"NSAllowsLocalNetworking": True}
 assert "NSMicrophoneUsageDescription" not in info, "Microphone is not implemented in this stage"
 assert privacy["NSPrivacyTracking"] is False and privacy["NSPrivacyCollectedDataTypes"] == []

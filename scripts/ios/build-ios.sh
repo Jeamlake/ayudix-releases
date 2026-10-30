@@ -22,10 +22,18 @@ xcodegen generate --spec "$ROOT/mobile-ios/project.yml" --project "$ROOT/mobile-
 if [[ "$MODE" == "simulator" ]]; then
   if [[ -z "${AYUDIX_SIMULATOR_UDID:-}" ]]; then echo "Define AYUDIX_SIMULATOR_UDID con un simulador disponible de iPhone 17." >&2; exit 2; fi
   RESULT="$LOGS/ios-ui-tests-$(date -u +%Y%m%dT%H%M%SZ)-$$.xcresult"
+  set +e
   xcodebuild test -project "$ROOT/mobile-ios/Ayudix.xcodeproj" -scheme Ayudix \
     -configuration Debug -sdk iphonesimulator -destination "platform=iOS Simulator,id=$AYUDIX_SIMULATOR_UDID" \
     -derivedDataPath "$DERIVED" -resultBundlePath "$RESULT" \
     CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- | tee "$LOGS/simulator-build.log"
+  BUILD_STATUS=${PIPESTATUS[0]}
+  set -e
+  if [[ -d "$RESULT" ]]; then
+    xcrun xcresulttool get test-results summary --path "$RESULT" > "$LOGS/native-test-summary.json" || echo "No se pudo exportar el resumen; se conserva el xcresult."
+    xcrun xcresulttool export attachments --path "$RESULT" --output-path "$LOGS/attachments" || echo "No se pudieron exportar los adjuntos; se conserva el xcresult."
+  fi
+  if [[ "$BUILD_STATUS" -ne 0 ]]; then exit "$BUILD_STATUS"; fi
 else
   xcodebuild build -project "$ROOT/mobile-ios/Ayudix.xcodeproj" -scheme Ayudix \
     -configuration Debug -sdk iphoneos -destination 'generic/platform=iOS' \

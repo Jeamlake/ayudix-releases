@@ -11,6 +11,7 @@
     <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
     <key>LSRequiresIPhoneOS</key><true/>
+    <key>CADisableMinimumFrameDurationOnPhone</key><true/>
     <key>NSCameraUsageDescription</key><string>Ayudix usa la cámara solo cuando decides escanear el QR de tu computadora para vincular este iPhone.</string>
     <key>NSLocalNetworkUsageDescription</key><string>Ayudix se conecta con la computadora que vincules para mostrar tus carpetas autorizadas y conversar con tu asistente local.</string>
     <key>NSAppTransportSecurity</key>

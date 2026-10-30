@@ -29,6 +29,7 @@ project = yaml.load((root / "mobile-ios/project.yml").read_text(encoding="utf-8"
 workflow = yaml.load((root / ".github/workflows/ayudix-ios.yml").read_text(encoding="utf-8"), Loader=Loader)
 assert set(workflow["on"]) == {"workflow_dispatch"}, "Only explicitly started builds are allowed"
 assert workflow["permissions"] == {"contents": "read"}
+assert workflow["on"]["workflow_dispatch"]["inputs"]["build_scope"]["options"] == ["all", "device-only"]
 job = workflow["jobs"]["build-and-check"]
 assert job["runs-on"] == "macos-26" and job["timeout-minutes"] == 45
 assert "private == false" in job["if"]

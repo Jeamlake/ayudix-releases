@@ -15,8 +15,10 @@ LOGS="${AYUDIX_IOS_LOGS:-$ROOT/qa/ios-preparation}"
 DERIVED="${AYUDIX_IOS_DERIVED:-$HOME/Library/Caches/Ayudix/Xcode/$MODE}"
 mkdir -p "$LOGS" "$DERIVED"
 if ! command -v xcodegen >/dev/null; then echo "Instala XcodeGen en la Mac y vuelve a ejecutar. No se descargan instaladores por suposición." >&2; exit 2; fi
-if ! xcodebuild -version | head -n1 | grep -q '^Xcode 26\.4'; then echo "Esta preparación fija Xcode 26.4.x, compatible con Kotlin 2.4.10. Selecciónalo con DEVELOPER_DIR." >&2; exit 2; fi
-xcodebuild -version > "$LOGS/xcode-version.txt"
+XCODE_VERSION="$(xcodebuild -version)"
+XCODE_FIRST_LINE="${XCODE_VERSION%%$'\n'*}"
+if [[ ! "$XCODE_FIRST_LINE" =~ ^Xcode\ 26\.4(\.[0-9]+)?$ ]]; then echo "Esta preparación fija Xcode 26.4.x, compatible con Kotlin 2.4.10. Selecciónalo con DEVELOPER_DIR." >&2; exit 2; fi
+printf '%s\n' "$XCODE_VERSION" > "$LOGS/xcode-version.txt"
 xcodegen --version > "$LOGS/xcodegen-version.txt"
 xcodegen generate --spec "$ROOT/mobile-ios/project.yml" --project "$ROOT/mobile-ios"
 if [[ "$MODE" == "simulator" ]]; then

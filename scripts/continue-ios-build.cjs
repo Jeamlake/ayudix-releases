@@ -4,7 +4,8 @@ const root=path.resolve(__dirname,'..'),repo='Jeamlake/ayudix-releases',branch='
 const logs=process.env.AYUDIX_PREPARATION_LOGS||'C:/Desarrollo/Logs/Ayudix/iOS-Preparacion-2026-10-30';
 const gh=process.env.AYUDIX_GH||'C:/Program Files/GitHub CLI/gh.exe';
 const args=new Set(process.argv.slice(2));
-for(const flag of args)if(!['--sync','--activate','--run','--status'].includes(flag))throw Error('Unknown operation: '+flag);
+for(const flag of args)if(!['--sync','--activate','--run','--status','--device-only'].includes(flag))throw Error('Unknown operation: '+flag);
+if(args.has('--device-only')&&!args.has('--run'))throw Error('Device-only is a build mode, not a stand-alone operation');
 fs.mkdirSync(logs,{recursive:true});let n=0;
 function call(endpoint,body,method){
  const request=['api',endpoint];
@@ -81,9 +82,21 @@ if(args.has('--run')){
  if(head.object.sha!==publication.commit)throw Error('Source branch changed; verify the new commit before dispatch');
  const active=call(`repos/${repo}/contents/.github/workflows/ayudix-ios.yml?ref=${metadata.default_branch}`);
  if(active.sha!==gitHash(workflow))throw Error('The activated workflow differs from the reviewed local definition');
+ let simulatorEvidence=null;
+ if(args.has('--device-only')){
+  simulatorEvidence=JSON.parse(fs.readFileSync(path.join(logs,'native-ui-evidence.json')));
+  if(simulatorEvidence.result!=='Passed'||simulatorEvidence.passedTests!==3||simulatorEvidence.failedTests!==0)throw Error('A successful native UI run is required for device-only continuation');
+  const priorRun=call(`repos/${repo}/actions/runs/${simulatorEvidence.runId}/jobs`).jobs;
+  if(!priorRun.some(j=>j.steps.some(s=>s.name==='Compilar y probar interfaz iOS'&&s.conclusion==='success')))throw Error('GitHub does not confirm the successful simulator step');
+  const priorTree=call(`repos/${repo}/git/trees/${simulatorEvidence.sourceCommit}?recursive=1`);
+  const nextTree=call(`repos/${repo}/git/trees/${publication.commit}?recursive=1`);
+  const nativeInputs=t=>t.tree.filter(f=>f.type==='blob'&&/^(mobile-ios|mobile-shared)\//.test(f.path)).map(f=>[f.path,f.sha]).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(JSON.stringify(nativeInputs(priorTree))!==JSON.stringify(nativeInputs(nextTree)))throw Error('Native inputs changed after simulator validation; run the full workflow');
+ }
  const started=new Date().toISOString();
- call(`repos/${repo}/actions/workflows/ayudix-ios.yml/dispatches`,{ref:metadata.default_branch,inputs:{source_ref:publication.commit}});
- fs.writeFileSync(runFile,JSON.stringify({dispatched:true,started,sourceCommit:publication.commit,repository:repo,workflowRef:metadata.default_branch},null,2));
+ const buildScope=args.has('--device-only')?'device-only':'all';
+ call(`repos/${repo}/actions/workflows/ayudix-ios.yml/dispatches`,{ref:metadata.default_branch,inputs:{source_ref:publication.commit,build_scope:buildScope}});
+ fs.writeFileSync(runFile,JSON.stringify({dispatched:true,started,sourceCommit:publication.commit,repository:repo,workflowRef:metadata.default_branch,buildScope,...(simulatorEvidence?{nativeUiEvidence:simulatorEvidence}: {})},null,2));
  console.log(JSON.stringify({dispatched:true,sourceCommit:publication.commit,started}));
 }
 if(args.has('--status')){

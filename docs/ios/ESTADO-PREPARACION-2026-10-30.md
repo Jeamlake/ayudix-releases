@@ -34,7 +34,7 @@ No están implementados todavía el envío/descarga de archivos con recibo, repr
 | Caché pip fijada | `C:\Desarrollo\Cache\pip` |
 | Informes y vista previa | `C:\Desarrollo\Logs\Ayudix\iOS-Preparacion-2026-10-30` |
 
-No se instalaron Xcode ni un simulador Apple en Windows. No se instaló AltServer y no se introdujeron credenciales Apple.
+No se instalaron Xcode ni un simulador Apple en Windows. El propietario eligió AltStore gratuito. Se descargó el instalador oficial de AltServer en `C:\Desarrollo\Instaladores\Ayudix-iOS\AltServer`; no está instalado y sus archivos no tienen firma Authenticode. No se introdujeron credenciales Apple.
 
 ## Compilación Apple y repositorio
 
@@ -42,7 +42,9 @@ El repositorio local no tenía un remoto `origin`. El repositorio de GitHub enco
 
 La preparación se exporta con una lista explícita de fuentes nuevas y revisión de contenido. El workflow local está en `.github/workflows/ayudix-ios.yml`; para revisión sin activar Actions puede guardarse como `docs/ios/ayudix-ios.workflow.yml`. Esa copia es inerte y no concede permisos.
 
-El acceso actual de GitHub CLI tiene `repo`, `read:org` y `gist`, y **no** tiene `workflow`. Falta autorizar ese alcance mediante el flujo oficial antes de publicar el archivo en `.github/workflows` y ejecutarlo. No se intentó eludir ese requisito ni ampliar el acceso del conector GitHub de Ayudix.
+El propietario completó la autorización oficial de GitHub CLI con el alcance `workflow`. Se activó la compilación manual en `main`, que lee un commit concreto de la rama iOS sin fusionarla. Esta autorización pertenece a la herramienta de desarrollo y no amplía los permisos del conector GitHub de Ayudix.
+
+Primera ejecución nativa: https://github.com/Jeamlake/ayudix-releases/actions/runs/41086799889. Fuentes seleccionadas: `4c5cdecf4f6e78c037dbe2544efe83cab7cbf3f7`. La preparación permanece en el borrador https://github.com/Jeamlake/ayudix-releases/pull/1. Los resultados nativos se añadirán al finalizar la ejecución; su arranque no acredita todavía éxito o un IPA instalable.
 
 ## Pendiente para entregar al iPhone 17
 
@@ -51,3 +53,5 @@ El acceso actual de GitHub CLI tiene `repo`, `read:org` y `gist`, y **no** tiene
 3. Elegir firma/distribución: pruebas personales con renovación periódica o Apple Developer para TestFlight/App Store. El IPA de dispositivo que pueda producir el workflow es **sin firma**, no instalable directamente.
 4. Probar la vinculación y el comportamiento de cámara/red/Keychain en el teléfono físico. No hay un IPA firmado ni una instalación acreditada en esta preparación.
 5. Incorporar transferencias verificadas, multimedia, voz y escritorio por etapas; no trasladar el módulo Android de streaming como si fuera binario iOS.
+
+La [guía de instalación desde Windows](INSTALAR-DESDE-WINDOWS.md) explica la firma personal elegida con AltStore y la prueba física pendiente.

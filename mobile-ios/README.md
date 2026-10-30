@@ -47,6 +47,8 @@ La salida de dispositivo será `release/ios-preparation/Ayudix-iOS-0.1.0-prepara
 
 ## Firma y distribución pendientes
 
+La [guía de instalación desde Windows](../docs/ios/INSTALAR-DESDE-WINDOWS.md) separa la firma personal de la compilación y detalla la prueba física.
+
 Para pruebas personales desde Windows, una opción es AltServer/AltStore Classic con renovación de firma cada siete días. Para TestFlight/App Store se necesita la cuenta y membresía Apple correspondiente. El propietario debe introducir sus credenciales únicamente en el flujo elegido; no se incluyen en el código, en GitHub Actions ni en el chat.
 
 Antes de distribuir hay que validar la primera compilación y las pruebas Apple, la firma, la cámara y red local en el iPhone 17, los permisos, orientación/teclado, los manifiestos de privacidad de las dependencias, el icono exportado y la forma de actualizar. No se publica ni instala automáticamente este cliente desde el canal Android/Windows.

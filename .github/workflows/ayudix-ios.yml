@@ -1,0 +1,72 @@
+name: Ayudix iOS · preparación
+run-name: Ayudix iOS · ${{ inputs.source_ref }}
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Commit o rama de preparación que se va a compilar
+        required: true
+        default: ios/preparation-2026-10-30
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ios-preparation-${{ inputs.source_ref }}
+  cancel-in-progress: true
+jobs:
+  build-and-check:
+    # Standard public-repository runner only. Never fall back to a paid private job.
+    if: github.event.repository.private == false
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.4.app/Contents/Developer
+      GRADLE_USER_HOME: ${{ runner.temp }}/Ayudix/Gradle
+      KONAN_DATA_DIR: ${{ runner.temp }}/Ayudix/KotlinNative
+      AYUDIX_IOS_LOGS: ${{ runner.temp }}/Ayudix/Logs
+      AYUDIX_IOS_DERIVED: ${{ runner.temp }}/Ayudix/Xcode
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.source_ref }}
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Verificar herramientas Apple
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version
+          if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi
+          xcodegen --version
+          mkdir -p "$AYUDIX_IOS_LOGS"
+          git rev-parse HEAD > "$AYUDIX_IOS_LOGS/source-commit.txt"
+      - name: Probar contratos compartidos
+        working-directory: mobile-shared
+        run: /bin/bash ./gradlew :core:jvmTest :ui:jvmTest --no-daemon --max-workers=2
+      - name: Elegir simulador de iPhone 17
+        shell: bash
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; rows=[d for group in json.load(sys.stdin)["devices"].values() for d in group if d.get("isAvailable") and d.get("name")=="iPhone 17"]; assert rows,"Falta un simulador disponible de iPhone 17"; print(rows[0]["udid"])')
+          echo "AYUDIX_SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
+      - name: Compilar y probar interfaz iOS
+        run: /bin/bash scripts/ios/build-ios.sh simulator
+      - name: Preparar paquete de dispositivo sin firma
+        env:
+          AYUDIX_IOS_DERIVED: ${{ runner.temp }}/Ayudix/XcodeDevice
+        run: /bin/bash scripts/ios/build-ios.sh device
+      - name: Guardar informes y paquete de preparación
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: Ayudix-iOS-preparation-UNSIGNED
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/Ayudix/Logs/
+            mobile-shared/core/build/test-results/
+            release/ios-preparation/

@@ -1,0 +1,12 @@
+Ayudix.xcodeproj/
+Ayudix.xcworkspace/
+DerivedData/
+build/
+xcuserdata/
+*.xcuserstate
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.pem
+*.ipa
+.DS_Store

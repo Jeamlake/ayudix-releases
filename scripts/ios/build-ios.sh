@@ -25,7 +25,7 @@ if [[ "$MODE" == "simulator" ]]; then
   xcodebuild test -project "$ROOT/mobile-ios/Ayudix.xcodeproj" -scheme Ayudix \
     -configuration Debug -sdk iphonesimulator -destination "platform=iOS Simulator,id=$AYUDIX_SIMULATOR_UDID" \
     -derivedDataPath "$DERIVED" -resultBundlePath "$RESULT" \
-    CODE_SIGNING_ALLOWED=NO | tee "$LOGS/simulator-build.log"
+    CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- | tee "$LOGS/simulator-build.log"
 else
   xcodebuild build -project "$ROOT/mobile-ios/Ayudix.xcodeproj" -scheme Ayudix \
     -configuration Debug -sdk iphoneos -destination 'generic/platform=iOS' \

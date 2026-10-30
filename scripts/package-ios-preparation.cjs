@@ -3,6 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const root=path.resolve(__dirname,'..');
 const roots=['mobile-shared/core/src','mobile-shared/ui/src','mobile-shared/gradle','mobile-ios/Sources','mobile-ios/Resources','mobile-ios/Tests','scripts/ios','docs/ios'];
 const singles=['LICENSE','.gitattributes','assets/ayudix-link.svg','mobile-shared/.gitignore','mobile-ios/.gitignore','mobile-shared/README.md','mobile-shared/settings.gradle.kts','mobile-shared/build.gradle.kts','mobile-shared/gradle.properties','mobile-shared/gradlew','mobile-shared/gradlew.bat','mobile-shared/core/build.gradle.kts','mobile-shared/ui/build.gradle.kts','mobile-ios/README.md','mobile-ios/project.yml','scripts/test-mobile-shared.ps1','scripts/verify-ios-preparation.py','scripts/package-ios-preparation.cjs','scripts/publish-ios-preparation.cjs','.github/workflows/ayudix-ios.yml'];
+singles.push('scripts/continue-ios-build.cjs');
 const skip=new Set(['build','.gradle','.kotlin','.swiftpm','DerivedData','xcuserdata']);
 const files=[],zip={};
 function add(relative){

@@ -1,10 +1,17 @@
 name: Ayudix iOS · preparación
+run-name: Ayudix iOS · ${{ inputs.source_ref }}
 on:
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Commit o rama de preparación que se va a compilar
+        required: true
+        default: ios/preparation-2026-10-30
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: ios-preparation-${{ github.ref }}
+  group: ios-preparation-${{ inputs.source_ref }}
   cancel-in-progress: true
 jobs:
   build-and-check:
@@ -22,6 +29,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+          ref: ${{ inputs.source_ref }}
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -34,6 +42,8 @@ jobs:
           xcodebuild -version
           if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi
           xcodegen --version
+          mkdir -p "$AYUDIX_IOS_LOGS"
+          git rev-parse HEAD > "$AYUDIX_IOS_LOGS/source-commit.txt"
       - name: Probar contratos compartidos
         working-directory: mobile-shared
         run: /bin/bash ./gradlew :core:jvmTest :ui:jvmTest --no-daemon --max-workers=2
